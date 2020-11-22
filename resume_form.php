@@ -1,0 +1,126 @@
+<?php include 'cand_base.php' ;
+
+ $query =" SELECT * FROM fileupload WHERE fk ='$id' AND c_id=".$_SESSION['c_id'];
+       $ssql = mysqli_query($db,$query) or die( mysqli_error($db));
+      $result = mysqli_fetch_array($ssql,MYSQLI_ASSOC);
+     $rnum = $ssql->num_rows;
+
+       //for skipping the form
+     $skipy =" SELECT * FROM skip_module WHERE r_id ='$id' AND form_number=5 AND c_id=".$_SESSION['c_id'] ;
+      $ssql = mysqli_query($db,$skipy) or die( mysqli_error($db));
+            $skip_result = mysqli_fetch_array($ssql,MYSQLI_ASSOC);
+     $skip_rnum = $ssql->num_rows;
+
+ ?>
+
+
+        <!--------------- pop up form---------------->
+                                        <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add a reason to skip the form</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    <form action="upload.php" method="POST" enctype="multipart/form-data" class="form-horizontal">
+      <div class="modal-body">
+        <input name="skip_comment" type="text"  value="<?php echo $skip_result['skip_comment']; ?>" class="form-control" required><br>
+           <label for="status" class=" form-control-label">status : </label>
+           <?php if($skip_rnum==1 and $skip_result['skip_status']==1) echo '<font color="green">Approved</font>'; else if($skip_rnum==1 and $skip_result['skip_status']==0)  echo '<font color="orange">Under Observation</font>';
+           else if($skip_rnum==1 and $skip_result['skip_status']==2)  echo '<font color="red">Rejected</font>'; ?>
+      </div>
+      <div class="modal-footer">
+<a href="upload.php?delete_skip=true"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete request</button></a>   
+     <button type="submit"  name="skip" class="btn btn-primary">Send request to HR</button>
+      </div>
+  </form>
+    </div>
+  </div>
+</div>
+
+<!--------------------------close popup form --------------------->
+
+<div class="main-content p-t-80">
+                <div class="section__content section__content--p20">
+                    <div class="container-fluid">
+                        <?php if (isset($_GET['msg']))
+                        {
+                            $type=$_GET['type'];
+                            if($type=="success")
+                            {
+                                echo '<div class="alert alert-success alert-dismissible" id="myalert">';
+                                  echo '<span class="close " data-dismiss="alert">&times;</span>';
+                                 echo  $_GET['msg'];
+                                echo '</div>';
+                                
+                            }
+                            else if($type=="fail")
+                            {
+                                echo '<div class="alert alert-danger alert-dismissible" id="myalert">';
+                                  echo '<span class="close " data-dismiss="alert">&times;</span>';
+                                 echo  $_GET['msg'];
+                                echo '</div>';
+                            }
+                        
+
+                         }
+?>
+
+                        <div class="row">
+                        		<div class="col-lg-12">
+                                <div class="card " id="Candidate-info" >
+                                    <div class="card-header">
+                                        <strong>Upload resume</strong> 
+                                    </div>
+                                    <div class="card-body card-block">
+                                        <form action="upload.php" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                                          <div class="row form-group">
+                                                <div class="col-6 ">
+                                         		<div class="form-group">
+                                              <small class="form-text" style="color: blue;">
+                                                <?php if($result['pdf_file'])
+                                                { echo $result['pdf_file'] ;
+                                                  echo "<br>";                                                 
+                                                  echo '<font color="black">was previously uploaded </font>';
+                                                  
+                                                } ?>
+                                                </small>
+                                    <br><label class="btn btn-success btn-sm">
+                                       <i class="fa fa-dot-circle-o"></i> Upload New Resume
+                                       <input type="file" name="file"  class="form-control-file"  hidden / >
+                                   </label>
+                                                <small class="form-text" style="color: red;">*Only Word Format, doc, docx</small>
+                                
+                                                </div>
+                                            </div>
+                                                <div class="col-6">
+                                                <div class="form-group">
+                                                    <label for="postal-code" class=" form-control-label">Upload date</label>
+                                         <input name="upload_date" type="text" id="postal-code" value="<?php if($result['upload_date']=='') echo date("Y-m-d"); else echo $result['upload_date'] ?>" class="form-control" readonly>
+
+                                               </div>  
+                                            </div>
+                                            </div>
+                                             <div class="card-footer">
+                                           <button type="submit" name="submit" class="btn btn-success btn-sm" >
+                                            <i class="fa fa-dot-circle-o"></i> Submit
+                                        </button>
+                                        <?php if($rnum==1) echo ' <a href="upload.php?move=true"><button  name="submit" class="btn btn-primary btn-sm" >
+                                            <i class="fa fa-dot-circle-o"></i> Next
+                                        </button></a> ' ;?>
+                                        <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-warning btn-sm" hidden>
+                                            <i class="fa fa-dot-circle-o"></i> Skip
+                                        </button>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
